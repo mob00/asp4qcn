@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QCN-Solver</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-top: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .graph-container {
+  display: inline-block; /* Allows it to wrap around content */
+  max-width: 100%; /* Prevents overflow */
+  border: 1px solid #ddd;
+  padding: 10px;
+  background: #fff;
+  border-radius: 5px;
+  text-align: center; /* Centers inline elements */
+}
+
+.graph-container svg {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/clingo-wasm@0.1.0"></script>
+  <script src="https://rsms.me/graphviz/graphviz.js"></script>
+  <script src="demo/util.js"></script>
+  <script src="demo/qr.js"></script>
+  <div class="container">
+    <h1>Qualitative Constraint Network Solver</h1>
+    
+    <label for="code-editor">Input QCN:</label>
+    <textarea id="code-editor" name="code-editor">
+% Example QCN
+1 2 ( o si )
+1 4 ( di b )
+2 3 ( fi si o )
+2 4 ( di d o )
+3 4 ( b bi )
+    </textarea>
+
+    <button id="alert-button">Solve!</button>
+
+    <div class="graph-container" id="graph-container"></div>
+
+    <label for="result-text">Solution:</label>
+    <textarea id="result-text" name="result-text" readonly></textarea>
+  </div>
+
+<script>
+    document.getElementById('code-editor').addEventListener('input', function() {
+        console.log('Textarea content changed:', this.value);
+        const result = parseQCNInput(this.value);
+        console.log(result.graphvizString);
+        graphviz.layout(result.graphvizString, "svg", "circo").then(svg => {
+            document.getElementById('graph-container').innerHTML = svg;
+            window.aspString = parseQCNInput(this.value).aspString;
+            console.log(window.aspString);
+        });
+    });
+
+    const event = new Event('input', {
+        bubbles: true,
+        cancelable: true,
+    });
+    document.getElementById('code-editor').dispatchEvent(event);
+    document.getElementById('alert-button').addEventListener('click', async function() {
+    console.log(window.aspString);
+    result = await solveQCN(window.aspString);
+    witnesses = result['Call'][0]['Witnesses'];
+    document.getElementById('result-text').value  = '';
+    witnesses.forEach(element => {
+        document.getElementById('result-text').value += element['Value'] + '\n';
+    });
+    console.log(witnesses);
+    });
+</script>
+</body>
+</html>
