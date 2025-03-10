@@ -61,9 +61,8 @@
 </head>
 <body>
   <script src="https://cdn.jsdelivr.net/npm/clingo-wasm@0.1.0"></script>
-  <script src="https://rsms.me/graphviz/graphviz.js"></script>
+  <!-- <script src="https://rsms.me/graphviz/graphviz.js"></script> -->
   <script src="demo/util.js"></script>
-  <script src="demo/qr.js"></script>
   <div class="container">
     <h1>Qualitative Constraint Network Solver</h1>
     
@@ -90,11 +89,12 @@
         console.log('Textarea content changed:', this.value);
         const result = parseQCNInput(this.value);
         console.log(result.graphvizString);
-        graphviz.layout(result.graphvizString, "svg", "circo").then(svg => {
-            document.getElementById('graph-container').innerHTML = svg;
-            window.aspString = parseQCNInput(this.value).aspString;
-            console.log(window.aspString);
-        });
+        window.aspString = result.aspString;
+        // graphviz.layout(result.graphvizString, "svg", "circo").then(svg => {
+        //     document.getElementById('graph-container').innerHTML = svg;
+        //     
+        //     console.log(window.aspString);
+        // });
     });
 
     const event = new Event('input', {
